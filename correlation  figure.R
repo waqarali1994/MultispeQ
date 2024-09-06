@@ -2,7 +2,7 @@ library(ggplot2)
 library(dplyr)
 library(reshape2)
 
-setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
+setwd("~/Documents/Documents/PhD work/Multispeq project/multispeq paper data")
 # Load and clean the dataset
 multispeq_paper_coreelation <- read.csv("filtered_multispeq_cutoff.csv")
 multispeq_paper_coreelation <- multispeq_paper_coreelation[-1]  # Assuming first column is to be removed

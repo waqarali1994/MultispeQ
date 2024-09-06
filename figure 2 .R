@@ -3,7 +3,7 @@ library(dplyr)
 library(ggplot2)
 library(wesanderson)
 
-setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
+setwd("~/Documents/Documents/PhD work/Multispeq project/multispeq paper data")
 # Define a common theme with increased tick length and legend text size
 common_theme <- theme_classic() +
   theme(
@@ -176,7 +176,7 @@ print(p)
 
 
 
-setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
+setwd("~/Documents/Documents/PhD work/Multispeq project/multispeq paper data")
 
 # Load necessary libraries
 library(data.table)

@@ -2,9 +2,9 @@ library(dplyr)
 library(ggplot2)
 library(patchwork)
 
-setwd("~/Desktop/sptas_trends/TWAS2020_genes_eQTL_results")
+setwd("~/Documents/Documents/PhD work/Multispeq project/multispeq paper data")
 # Load the datasets
-chlorophyll_data <- read.csv('Michaelcholorphyll.csv')
+chlorophyll_data <- read.csv('Michael cholorphyll.csv')
 genotype_data <- read.csv('transposed_gene_genotype_data.csv')
 
 # Merge datasets on 'Genotype_ID'

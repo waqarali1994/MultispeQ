@@ -3,7 +3,7 @@ library(svglite)
 library(data.table)
 library(patchwork)
 
-setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
+setwd("~/Documents/Documents/PhD work/Multispeq project/multispeq paper data")
 
 # Read and prepare the dataset
 multispq_densityplot <- fread("filtered_multispeq_cutoff.csv")

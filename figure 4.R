@@ -1,8 +1,9 @@
 library(ggplot2)
 library(data.table)
 library(patchwork)
+library(hms)  # For handling times effectively
 
-setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
+#setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
 
 # Define a common theme with increased tick length
 common_theme_with_ticks <- theme_classic() +
@@ -11,7 +12,7 @@ common_theme_with_ticks <- theme_classic() +
     axis.text.y = element_text(size = 22, color = "black"),
     axis.title = element_text(size = 22, color = "black"),
     axis.line = element_line(size = 1.4, color = "black"),
-    axis.ticks.length = unit(0.4, "cm"),# Increase tick length
+    axis.ticks.length = unit(0.4, "cm"), # Increase tick length
     axis.ticks = element_line(size = 1.2),  # Increase tick width
     legend.position = "top",
     legend.title = element_blank(),
@@ -23,30 +24,40 @@ common_theme_with_ticks <- theme_classic() +
   )
 
 # Function to create a plot for a given date and color
-create_plot <- function(data, date, color, formatted_date, show_y_label = TRUE, show_x_label = FALSE, detailed_x_axis = FALSE, custom_y_breaks = c(0, 1000, 2000)) {
+create_plot <- function(data, date, color, formatted_date, show_y_label = TRUE, show_x_label = FALSE, custom_y_breaks = c(0, 1000, 2000)) {
   data_filtered <- data[data$Date == as.Date(date), ]
   data_filtered$FormattedDate <- factor(format(data_filtered$Date, "%B-%d"), levels = formatted_date)
+  
+  # Convert Time from decimal hours to hms format
+  data_filtered$Time <- hms::as_hms(data_filtered$Time * 3600)  # Convert decimal hours to seconds and then to hms
+  
+  # Set the start and end times in seconds
+  start_time <- as.numeric(hms::as_hms("09:00:00"))
+  end_time <- as.numeric(hms::as_hms("14:30:00"))  # Set the end time to 2:30 PM (14:30:00)
+  
+  # Define breaks manually to ensure 2:30 PM is included
+  time_breaks <- c(
+    hms::as_hms("09:00:00"),
+    hms::as_hms("11:00:00"),
+    hms::as_hms("13:00:00"),
+    hms::as_hms("14:30:00")  # Ensure 2:30 PM is shown
+  )
   
   p <- ggplot(data_filtered, aes(x = Time, y = Light_Intensity, color = FormattedDate)) +
     geom_line(size = 1) +
     scale_color_manual(values = setNames(color, formatted_date)) +
-    scale_y_continuous(breaks = custom_y_breaks, labels = as.character(custom_y_breaks)) +  # Custom Y-axis with specified breaks
+    scale_y_continuous(
+      breaks = custom_y_breaks, 
+      limits = c(0, 2000),  # Set fixed limits for the y-axis
+      labels = as.character(custom_y_breaks)  # Ensure consistent labels
+    ) +
     ylab('Light Intensity') +
-    common_theme_with_ticks
-  
-  if (detailed_x_axis) {
-    # Detailed x-axis for plot on July 25
-    p <- p + scale_x_continuous(
-      breaks = c(9.5, 9.75, 10.20),  # 9:30, 9:45, 10:00 in decimal hours
-      labels = c("9:30 AM", "9:45 AM", "10:00 AM")
+    common_theme_with_ticks +
+    scale_x_time(
+      limits = c(hms::as_hms(start_time), hms::as_hms(end_time)),  # Set the time range from 9:30 AM to 2:30 PM
+      breaks = time_breaks,  # Manually set the breaks to ensure 2:30 PM is included
+      labels = scales::time_format("%I:%M %p")  # Format time with AM/PM
     )
-  } else {
-    # Normal x-axis with times 10:00 AM, 11:00 AM, 12:00 PM, and 1:30 PM
-    p <- p + scale_x_continuous(
-      breaks = c(10, 11.5, 13.5),  # 10:00 AM, 11:00 AM, 12:00 PM, 1:30 PM in decimal hours
-      labels = c("10:00 AM", "12:00 PM","2:00 PM")
-    )
-  }
   
   if (!show_y_label) {
     p <- p + theme(axis.title.y = element_blank())
@@ -64,11 +75,11 @@ create_plot <- function(data, date, color, formatted_date, show_y_label = TRUE, 
 data <- fread("Nebraska2020MultiSpeQPostFlowering.csv")
 data$Date <- as.Date(data$Date, "%m/%d/%y")
 
-# Create plots for different dates
+# Create plots for different dates 
 plot_23 <- create_plot(data, "2020-07-23", "darkred", "July-23", show_y_label = TRUE, show_x_label = FALSE)
-plot_24 <- create_plot(data, "2020-07-24", "darkgreen", "July-24", show_y_label = TRUE, show_x_label = FALSE)  # Normal x-axis
-plot_25 <- create_plot(data, "2020-07-25", "navyblue", "July-25", show_y_label = TRUE, show_x_label = FALSE, detailed_x_axis = TRUE, custom_y_breaks = c(0, 750, 1500))  # Detailed x-axis and custom y-axis for July 25
-plot_28 <- create_plot(data, "2020-07-28", "darkorange4", "July-28", show_y_label = TRUE, show_x_label = TRUE)  # Normal x-axis, keep the x-axis title
+plot_24 <- create_plot(data, "2020-07-24", "darkgreen", "July-24", show_y_label = TRUE, show_x_label = FALSE)
+plot_25 <- create_plot(data, "2020-07-25", "navyblue", "July-25", show_y_label = TRUE, show_x_label = FALSE, custom_y_breaks = c(0, 1000, 2000))
+plot_28 <- create_plot(data, "2020-07-28", "darkorange4", "July-28", show_y_label = TRUE, show_x_label = TRUE)
 
 # Manually annotate the second set of plots
 plot_23 <- plot_23 + 
