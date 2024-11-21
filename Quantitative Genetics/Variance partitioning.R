@@ -6,8 +6,8 @@ library(dplyr)
 mergedblups <- read.csv("extremevalueremoved.csv")
 
 # Modify Row and Column values by appending A and B
-mergedblups$Row <- paste0(mergedblups$Row, "A")
-mergedblups$Column <- paste0(mergedblups$Column, "B")
+#mergedblups$Row <- paste0(mergedblups$Row, "A")
+#mergedblups$Column <- paste0(mergedblups$Column, "B")
 
 # Convert Row and Column to factors if they are not already
 mergedblups$Row <- as.factor(mergedblups$Row)

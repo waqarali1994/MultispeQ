@@ -7,7 +7,7 @@ library(patchwork)
 setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
 # Read the heritability results data
 simple_heritability <- fread("simple_model_heritability.csv")
-spats_heritability <- fread("spats_hereitability.csv")
+spats_heritability <- fread("spats_heritabilioty.csv")
 
 # Extract the order of traits from the simple heritability data
 simple_trait_order <- simple_heritability$Trait
@@ -73,7 +73,7 @@ heritability_plot_before <- ggplot(simple_heritability, aes(x = Trait, y = Herit
   )
 
 # Read data from the provided CSV file for variance
-variance_multispeq <- fread("variance_components_lme4_rawdata_percentage.csv")
+variance_multispeq <- fread("variance_components_without_ambient.csv")
 
 # Ensure the traits are ordered in the same way as the heritability plot
 variance_multispeq$Trait <- factor(variance_multispeq$Trait, levels = levels(simple_heritability$Trait))

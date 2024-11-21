@@ -1,6 +1,7 @@
 library(SpATS)
 library(tidyverse)
 
+setwd("~/Documents")
 # Load the data
 multispeq <- read.csv("extremevalueremoved.csv")
 
@@ -12,8 +13,8 @@ phenotypes <- c('Relative_Chlorophyll', 'ECS_.mAU', 'ECS_tau', 'gH.', 'vH.',
                 'PS1_Active.Centers', 'PS1_Open.Centers', 
                 'PS1_Over.Reduced.Centers', 'PS1_Oxidized.Centers')
 
-columnKnots <- 31 
-rowKnots <- 15
+columnKnots <- 15
+rowKnots <- 31
 numPlots <- length(unique(multispeq$PlotID))
 
 # Get unique Plot IDs and their corresponding Genotype IDs, converting PlotID to character
@@ -26,7 +27,7 @@ plot_genotype <- multispeq %>%
 model <- SpATS(response = phenotypes[1], genotype = 'PlotID',
                genotype.as.random = TRUE, 
                spatial = ~SAP(Column, Row, nseg = c(columnKnots, rowKnots)),
-               fixed = ~ Light_Intensity,
+               fixed = ~ Light_Intensity + Ambient_Temperature,
                random = ~ Day,
                data = multispeq)
 
@@ -44,7 +45,7 @@ for(i in 2:length(phenotypes)) {
   model <- SpATS(response = phenotypes[i], genotype = 'PlotID', 
                  genotype.as.random = TRUE,
                  spatial = ~SAP(Column, Row, nseg = c(columnKnots, rowKnots)), 
-                 fixed = ~ Light_Intensity,
+                 fixed = ~ Light_Intensity + Ambient_Temperature,
                  random = ~ Day,  # Ensure Day is included as a random factor
                  data = multispeq)
   
@@ -63,3 +64,4 @@ for(i in 2:length(phenotypes)) {
 
 # Save the BLUPs as a CSV
 write.csv(as.data.frame(spatiallyCorrectedBLUPs), "cross_validating_BLUPs.csv", row.names = FALSE)
+

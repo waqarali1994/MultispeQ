@@ -1,6 +1,6 @@
 library(rMVP)
 library(data.table)
-setwd("~/Documents/PhD work/Multispeq project/multispeq/Waqar_MultiSpeQ")
+setwd("~/Documents/figuringout_GWAS/")
 ## regular phenotype input
 
 # load rmvp formatted data
@@ -17,7 +17,7 @@ MVP.Data(fileVCF ="multispeqv3.vcf",
 )
 
 genotype <- attach.big.matrix("mvp.vcf.geno.desc")
-phenotype <- read.table("mvp.vcf.phe",head=TRUE)
+phenotype <- read.table("spatially_multispeq_blues_filtered_ordered_extremed_with_deviceid.csv", header = TRUE, sep = ",")
 map <- read.table("mvp.vcf.geno.map" , head = TRUE)
 Kinship <- attach.big.matrix("mvp.vcf.kin.desc")
 Covariates_PC <- bigmemory::as.matrix(attach.big.matrix("mvp.vcf.pc.desc"))
