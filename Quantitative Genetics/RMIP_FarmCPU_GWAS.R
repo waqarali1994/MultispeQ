@@ -1,6 +1,7 @@
 library(rMVP)
 library(data.table)
-setwd("~/Documents/figuringout_GWAS/")
+library(purrr)
+setwd("~/Documents/PhD work/Photosyntheiss_project/Photosynthsis_paper_data/Anlysis_data/Excluding_ambient_temperature/")
 ## regular phenotype input
 
 # load rmvp formatted data
@@ -17,7 +18,7 @@ MVP.Data(fileVCF ="multispeqv3.vcf",
 )
 
 genotype <- attach.big.matrix("mvp.vcf.geno.desc")
-phenotype <- read.table("spatially_multispeq_blues_filtered_ordered_extremed_with_deviceid.csv", header = TRUE, sep = ",")
+phenotype <- read.table("Feb1__intecept_ordered_filtered_included_excluding_ambient_extreme_removed.csv", header = TRUE, sep = ",")
 map <- read.table("mvp.vcf.geno.map" , head = TRUE)
 Kinship <- attach.big.matrix("mvp.vcf.kin.desc")
 Covariates_PC <- bigmemory::as.matrix(attach.big.matrix("mvp.vcf.pc.desc"))
@@ -33,13 +34,14 @@ for(x in 1:100){
   colnames(phe1)=paste0(colnames(phenotype),x)  # rename the phenotype by attaching bootstrap number
   for(i in 2:ncol(phe1)){
     imMVP <- MVP(phe = phe1[,c(1,i)], geno = genotype, map = map, K=Kinship, CV.FarmCPU=Covariates_PC, file.output="pmap.signal",
-                 nPC.FarmCPU = 3, maxLoop = 10, method = "FarmCPU", priority = 'memory',threshold=0.125, p.threshold=1.06e-8)
+                 nPC.FarmCPU = 3, maxLoop = 10, method = "FarmCPU",threshold=0.125, p.threshold=1.06e-8)
   }
 }
 
-traits=c('Relative_Chlorophyll', 'qL', 'PS1_Active.Centers', 'vH.', 'NPQt',
-         'FvP_over_FmP', 'PhiNO', 'gH.', 'Phi2', 'PhiNPQ', 'ECS_tau',
-         'PS1_Oxidized.Centers', 'PS1_Over.Reduced.Centers', 'PS1_Open.Centers')
+traits=c('Relative_Chlorophyll', 'ECS_tau', 'gH.', 'vH.',
+         'Phi2', 'PhiNPQ', 'PhiNO', 'qL', 'NPQt', 'FvP_over_FmP',
+         'PS1_Active.Centers', 'PS1_Open.Centers',
+         'PS1_Over.Reduced.Centers', 'PS1_Oxidized.Centers')
 
 get.support=function(trait){ # write a function to summarise the occurrence of signals, trait is what i have in the rmvp output filenames, disregarding the number of bootstrap
   files = list.files(pattern = paste0(trait,".*FarmCPU_signals.csv"))

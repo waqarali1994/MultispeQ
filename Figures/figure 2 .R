@@ -3,7 +3,7 @@ library(dplyr)
 library(ggplot2)
 library(wesanderson)
 
-setwd("~/Documents/Documents/PhD work/Multispeq project/multispeq paper data")
+setwd("~/Documents/PhD work/Photosyntheiss_project/Photosynthsis_paper_data/Multispeq project/multispeq paper data/")
 # Define a common theme with increased tick length and legend text size
 common_theme <- theme_classic() +
   theme(
@@ -176,7 +176,7 @@ print(p)
 
 
 
-setwd("~/Documents/Documents/PhD work/Multispeq project/multispeq paper data")
+setwd("~/Documents/PhD work/Photosyntheiss_project/Photosynthsis_paper_data/Multispeq project/multispeq paper data/")
 
 # Load necessary libraries
 library(data.table)
@@ -225,6 +225,9 @@ head(SNPS.1)
 genes.desc <- fread("B73_geneModels_v5.csv", data.table = F)
 # colnames(genes.desc)
 
+colnames(genes.desc)
+
+
 genes.desc.1 <- genes.desc %>%
   filter(chr==9, start > minW.1 &  end < maxw.1)
 
@@ -245,34 +248,44 @@ SNPS.1$R2comp[which(SNPS.1$R2 >= 0.6)] <- "High LD"
 SNPS.1$R2comp[which(SNPS.1$R2 < 0.6)] <- "low LD"
 SNPS.1$R2comp[which(SNPS.1$R2 == 1)] <- "associated SNP"
 
+
 plot1 <- ggplot() + 
   geom_point(data=SNPS.1[SNPS.1$R2comp == "associated SNP", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21, stroke = 0, size = 5, alpha = 0.9) +  # Adjust size here
+             shape = 21, stroke = 0, size = 5, alpha = 0.9) +  
   geom_point(data=SNPS.1[SNPS.1$R2comp == "High LD", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  # Adjust size here
+             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  
   geom_point(data=SNPS.1[SNPS.1$R2comp == "low LD", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  # Adjust size here
+             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  
   scale_y_continuous(breaks = c(0, 0.5, 1)) + 
   scale_fill_manual(values = c("blue", "red", "grey"),
                     breaks = c("associated SNP", "High LD", "low LD")) +
-  geom_point(data=genes.desc.1.inside[genes.desc.1.inside$strand=="+",],
-             aes(x=((start+end)/2)/1000000, y=1.1), colour="black" , shape="\u25BA", size=6) +
-  geom_point(data=genes.desc.1.inside[genes.desc.1.inside$strand=="-",], 
-             aes(x=((start+end)/2/1000000), y=1.05), colour="black", shape="\u25C4", size=6) +
+  
+  # Normal gene annotations (excluding the validated gene)
+  geom_point(data=genes.desc.1.inside[genes.desc.1.inside$strand == "+" & genes.desc.1.inside$ID != "Zm00001eb386270", ],
+             aes(x=((start+end)/2)/1000000, y=1.1), 
+             colour="black", shape="\u25BA", size=6) +
+  geom_point(data=genes.desc.1.inside[genes.desc.1.inside$strand == "-" & genes.desc.1.inside$ID != "Zm00001eb386270", ], 
+             aes(x=((start+end)/2)/1000000, y=1.05), 
+             colour="black", shape="\u25C4", size=6) +
+  
+  # Highlight the validated gene Zm00001eb386270 with a green triangle
+  geom_point(data=subset(genes.desc.1.inside, ID == "Zm00001eb386270"),
+             aes(x=((start+end)/2)/1000000, y=1.1), 
+             colour="green", shape="\u25BA", size=6) +  # Green triangle
+  
   scale_x_continuous(labels = scales::number_format(accuracy = 0.1)) +
-  #scale_color_manual(values = c("blue4", "grey")) +
-  #geom_hline(yintercept = -log10(0.05/nrow(gwas.dat)), linetype=2) + 
-  #geom_vline(xintercept = minW.1/1000000, linetype="dotted", color = "black", linewidth=1) +
-  #geom_vline(xintercept = maxw.1/1000000, linetype="dotted", color = "black", linewidth=1) +
   common_theme +
   ylab(expression(R^2)) + 
   xlab(paste0("Chromosome 9 (Mb)")) +
   theme(legend.position = "none")
 
 plot1
+
+
+
 
 #ggplot_build(plot1)$layout$panel_params[[1]]$x.range
 #summary(SNPS.1)
@@ -297,28 +310,46 @@ SNPS.2$R2comp[which(SNPS.2$R2 >= 0.6)] <- "High LD"
 SNPS.2$R2comp[which(SNPS.2$R2 < 0.6)] <- "low LD"
 SNPS.2$R2comp[which(SNPS.2$R2 == 1)] <- "associated SNP"
 
+
+
+ggplot_build(plot2)$layout$panel_params[[1]]$x.range
+summary(SNPS.2)
+
+
+
 plot2 <- ggplot() + 
-geom_point(data=SNPS.2[SNPS.2$R2comp == "associated SNP", ],
-           aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-           shape = 21, stroke = 0, size = 5, alpha = 0.9) +  # Adjust size here
+  geom_point(data=SNPS.2[SNPS.2$R2comp == "associated SNP", ],
+             aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
+             shape = 21, stroke = 0, size = 5, alpha = 0.9) +  
   geom_point(data=SNPS.2[SNPS.2$R2comp == "High LD", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  # Adjust size here
+             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  
   geom_point(data=SNPS.2[SNPS.2$R2comp == "low LD", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  # Adjust size here
+             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  
   scale_y_continuous(breaks = c(0, 0.5, 1)) + 
   scale_fill_manual(values = c("#17BECF", "red", "grey"),
                     breaks = c("associated SNP", "High LD", "low LD")) +
-  geom_point(data=genes.desc.2[genes.desc.2$strand=="+",],
+  
+  # Normal gene annotations (excluding the validated gene)
+  geom_point(data=genes.desc.2[genes.desc.2$strand == "+" & genes.desc.2$ID != "Zm00001eb378270", ],
              aes(x = ((start + end) / 2) / 1000000, y = 1.1), 
              colour = "black", shape = "\u25BA", size = 6) +
-  geom_point(data=genes.desc.2[genes.desc.2$strand=="-",], 
+  geom_point(data=genes.desc.2[genes.desc.2$strand == "-" & genes.desc.2$ID != "Zm00001eb378270", ], 
              aes(x = ((start + end) / 2) / 1000000, y = 1.05), 
              colour = "black", shape = "\u25C4", size = 6) +
+  
+  # Highlight the validated gene Zm00001eb378270 with a green triangle
+  geom_point(data=subset(genes.desc.2, ID == "Zm00001eb378270"),
+             aes(x = ((start + end) / 2) / 1000000, y = 1.1), 
+             colour = "blue", shape = "\u25BA", size = 6) +  # Green triangle
+  
+  # Optional: Add a text label for the validated gene
+  geom_text(data=subset(genes.desc.2, ID == "Zm00001eb378270"),
+            aes(x = ((start + end) / 2) / 1000000, y = 1.15, label = ""), 
+            colour = "green", size = 6, fontface = "bold", hjust = 0) +
+  
   scale_x_continuous(labels = scales::number_format(accuracy = 0.1)) +
-  #geom_vline(xintercept = minW.2 / 1000000, linetype = "dotted", color = "black", linewidth = 1) +
-  #geom_vline(xintercept = maxw.2 / 1000000, linetype = "dotted", color = "black", linewidth = 1) +
   common_theme +
   ylab(expression(R^2)) + 
   xlab(paste0("Chromosome 9 (Mb)")) +
@@ -326,8 +357,6 @@ geom_point(data=SNPS.2[SNPS.2$R2comp == "associated SNP", ],
 
 plot2
 
-ggplot_build(plot2)$layout$panel_params[[1]]$x.range
-summary(SNPS.2)
 
 
 # Gene top 3
@@ -399,6 +428,8 @@ SNPS.4$R2comp[which(SNPS.4$R2 >= 0.6)] <- "High LD"
 SNPS.4$R2comp[which(SNPS.4$R2 < 0.6)] <- "low LD"
 SNPS.4$R2comp[which(SNPS.4$R2 == 1)] <- "associated SNP"
 
+
+
 plot4 <- ggplot() + 
   geom_point(data=SNPS.4[SNPS.4$R2comp == "associated SNP", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
@@ -426,6 +457,8 @@ plot4 <- ggplot() +
   xlab(paste0("Chromosome 8 (Mb)")) +
   theme(legend.position = "none")
 plot4
+
+
 
 # Gene top 5
 chr3_149998190 <- fread("LD_values/LD_chr3_149998190.ld", data.table = F)
@@ -475,6 +508,8 @@ plot5 <- ggplot() +
   theme(legend.position = "none")
 plot5
 
+
+
 # Gene top 6
 chr9_21755970 <- fread("LD_values/LD_chr9_21755970.ld", data.table = F)
 hitPOS.6 <- 21755970
@@ -495,34 +530,47 @@ SNPS.6$R2comp[which(SNPS.6$R2 >= 0.6)] <- "High LD"
 SNPS.6$R2comp[which(SNPS.6$R2 < 0.6)] <- "low LD"
 SNPS.6$R2comp[which(SNPS.6$R2 == 1)] <- "associated SNP"
 
+
 plot6 <- ggplot() + 
   geom_point(data=SNPS.6[SNPS.6$R2comp == "associated SNP", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21,stroke = 0, size = 5, alpha = 0.9) +  # Adjust size here
+             shape = 21, stroke = 0, size = 5, alpha = 0.9) +  
   geom_point(data=SNPS.6[SNPS.6$R2comp == "High LD", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  # Adjust size here
+             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  
   geom_point(data=SNPS.6[SNPS.6$R2comp == "low LD", ],
              aes(x = BP_B / 1000000, y = R2, fill = R2comp), 
-             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  # Adjust size here
+             shape = 21, color = "black", stroke = 0.5, size = 3, alpha = 0.9) +  
   scale_y_continuous(breaks = c(0, 0.5, 1)) + 
   scale_fill_manual(values = c("#2CA02C", "red", "grey"),
                     breaks = c("associated SNP", "High LD", "low LD")) +
-  geom_point(data=genes.desc.6.inside[genes.desc.6.inside$strand=="+",],
+  
+  # Normal gene annotations (excluding the validated gene)
+  geom_point(data=genes.desc.6.inside[genes.desc.6.inside$strand == "+" & genes.desc.6.inside$ID != "Zm00001eb377130", ],
              aes(x = ((start + end) / 2) / 1000000, y = 1.1), 
              colour = "black", shape = "\u25BA", size = 6) +
-  geom_point(data=genes.desc.6.inside[genes.desc.6.inside$strand=="-",], 
+  geom_point(data=genes.desc.6.inside[genes.desc.6.inside$strand == "-" & genes.desc.6.inside$ID != "Zm00001eb377130", ], 
              aes(x = ((start + end) / 2) / 1000000, y = 1.05), 
              colour = "black", shape = "\u25C4", size = 6) +
+  
+  # Highlight the validated gene Zm00001eb377130 with a green triangle
+  geom_point(data=subset(genes.desc.6.inside, ID == "Zm00001eb377130"),
+             aes(x = ((start + end) / 2) / 1000000, y = 1.1), 
+             colour = "blue", shape = "\u25BA", size = 6) +  # Green triangle
+  
+  # Optional: Add a text label for the validated gene
+  geom_text(data=subset(genes.desc.6.inside, ID == "Zm00001eb377130"),
+            aes(x = ((start + end) / 2) / 1000000, y = 1.15, label = ""), 
+            colour = "green", size = 6, fontface = "bold", hjust = 0) +
+  
   scale_x_continuous(labels = scales::number_format(accuracy = 0.1)) +
- # geom_vline(xintercept = minW.6 / 1000000, linetype = "dotted", color = "black", linewidth = 1) +
- # geom_vline(xintercept = maxw.6 / 1000000, linetype = "dotted", color = "black", linewidth = 1) +
   common_theme +
   ylab(expression(R^2)) + 
   xlab(paste0("Chromosome 9 (Mb)")) +
   theme(legend.position = "none")
 
 plot6
+
 
 
 # Assuming p, plot1, plot2, plot3, plot4, plot5, plot6 are already defined
@@ -562,3 +610,4 @@ print(combined_plot)
 
 # Optionally, save the combined plot
 ggsave("GWAS.svg", plot = combined_plot, width = 18, height = 12, dpi = 300)
+
