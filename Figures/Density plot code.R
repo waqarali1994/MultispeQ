@@ -131,11 +131,16 @@ hex_colors <- c("#2CA02C", "#FF7F0E", "brown", "#D62728", "#9467BD", "#8C564B",
                 "#BCBD22", "#437f85")
 colors_for_traits <- setNames(hex_colors, raw_trait_names)
 
-# Define the labels with expressions for the traits
-trait_labels <- c("Relative Chlorophyll", "qL", "PSI-ac", expression(vH^"+"), expression(NPQ[T]), "Fv'/Fm'",
-                  expression(Phi*NO), expression(gH^"+"), expression(Phi*PSII),
-                  expression(Phi*NPQ), expression(ECS[T]), "PSI-oxc", "PSI-orc",
-                  "PSI-opc")
+# Define the labels with expressions for the traits, including (BLUEs)
+trait_labels <- setNames(
+  c("Relative Chlorophyll (BLUEs)", "qL (BLUEs)", "PSI-ac (BLUEs)", 
+    expression(vH^"+" ~ "(BLUEs)"), expression(NPQ[T] ~ "(BLUEs)"), 
+    "Fv'/Fm' (BLUEs)", expression(Phi*NO ~ "(BLUEs)"), 
+    expression(gH^"+" ~ "(BLUEs)"), expression(Phi*PSII ~ "(BLUEs)"), 
+    expression(Phi*NPQ ~ "(BLUEs)"), expression(ECS[T] ~ "(BLUEs)"), 
+    "PSI-oxc (BLUEs)", "PSI-orc (BLUEs)", "PSI-opc (BLUEs)"),
+  raw_trait_names)
+
 names(trait_labels) <- raw_trait_names  # Associate labels with their respective trait names
 
 # Define a common theme with increased tick length and legend text size
@@ -195,3 +200,4 @@ print(combined_plot)
 
   # Optionally, save the combined plot
   ggsave("combined_density_plots.svg", plot = combined_plot, width = 18, height = 12, dpi = 300)
+  
